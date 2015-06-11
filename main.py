@@ -1,8 +1,9 @@
+#coding: utf-8
 import sys
 from page import Page, RootPage
 from pyscalambda import _, SF
-from toolz.functoolz import pipe
-from toolz.curried import map
+from toolz.functoolz import pipe, curry
+from toolz.curried import map, filter
 
 
 def save_reviews(product_id, tag, reviews):
@@ -38,16 +39,33 @@ def go_review_page(rank):
         _.click(),
     )
 
+def next_page(page):
+    try:
+        return next(page.execute_page_transition_yield(
+            _.find_element_by_class_name("CMpaginate"),
+            _.find_elements_by_tag_name("a"),
+            filter(lambda x: u"次" in x.text),
+            list,
+        )(_.click()))
+    except StopIteration:
+        return None
 
 def fetch_reviews(page, rank):
+    rp = page.execute_page_transition(
+            go_review_page(rank)
+    )
+    return fetch_reviews_detail(rp)
+
+def fetch_reviews_detail(page):
+    if page == None:
+        return []
     reviews = None
-    with page.execute_page_transition(
-        go_review_page(rank)
-    ) as review_page:
-        reviews = list(review_page.execute(
-                get_reviews
-        ))
-        return reviews 
+    with page as review_page:
+        reviews = review_page.execute(
+                get_reviews,
+                list
+        ) + fetch_reviews_detail(next_page(page))
+    return reviews
 
 def main(product_id):
 

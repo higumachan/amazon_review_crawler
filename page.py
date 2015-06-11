@@ -21,6 +21,17 @@ class Page(object):
         pipe(self.driver, *args)
         return LinkedPage(self.driver)
 
+    def execute_page_transition_yield(self, *args):
+        print "test"
+        def execute_page_transition_yield_detail(yield_fn):
+            for t in pipe(self.driver, *args):
+                print "test"
+                yield_fn(t)
+                yield LinkedPage(self.driver)
+        return execute_page_transition_yield_detail
+
+
+
 class RootPage(Page):
 
     def __exit__(self, type, value, traceback):
