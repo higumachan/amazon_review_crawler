@@ -7,7 +7,7 @@ from toolz.curried import map, filter
 
 
 def save_reviews(product_id, tag, reviews):
-    f = open("{}.{}.csv".format(product_id, tag), "w")
+    f = open("data/{}.{}.csv".format(product_id, tag), "w")
     for review in reviews:
         print review
         f.write("{},{}\n".format(
