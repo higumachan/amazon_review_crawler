@@ -92,24 +92,15 @@ def main(product_id, mode):
 
     url = "http://www.amazon.co.jp/gp/product/{}/".format(product_id)
 
-    with RootPage(url) as top:
-        print top.execute(
-            find_review_anchers,
-        )
-        if "p" in mode:
-            print "positive(star 5)"
-            positive_review = fetch_reviews(top, 0)
-            save_reviews(product_id, "p", positive_review)
-
-        if "e" in mode:
-            print "even (star 3)"
-            even_reviews = fetch_reviews(top, 2 * 3)
-            save_reviews(product_id, "e", even_reviews)
-
-        if "n" in mode:
-            print "negative(star 1)"
-            negative_reviews = fetch_reviews(top, 4 * 3)
-            save_reviews(product_id, "n", negative_reviews)
+    with RootPage("http://www.amazon.co.jp/product-reviews/{}/?filterBy=addFiveStar&".format(product_id)) as rp:
+        reviews = fetch_reviews_detail(rp)
+        save_reviews(product_id, "p", reviews)
+    with RootPage("http://www.amazon.co.jp/product-reviews/{}/?filterBy=addThreeStar&".format(product_id)) as rp:
+        reviews = fetch_reviews_detail(rp)
+        save_reviews(product_id, "e", reviews)
+    with RootPage("http://www.amazon.co.jp/product-reviews/{}/?filterBy=addOneStar&".format(product_id)) as rp:
+        reviews = fetch_reviews_detail(rp)
+        save_reviews(product_id, "n", reviews)
 
         
 if __name__ == '__main__':

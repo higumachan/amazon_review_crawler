@@ -5,6 +5,7 @@ class Page(object):
     def __init__(self, url):
         self.url = url
         self.driver = webdriver.Firefox()
+        self.driver.implicitly_wait(2) # seconds
 
     def __enter__(self):
         self.driver.get(self.url)
